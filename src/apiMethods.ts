@@ -5,11 +5,14 @@ import {
   SendGroupMessageData, 
   MessageDetails, 
   GroupDetails,
-  RecentMessages
+  RecentMessages,
+  ThreadList,
+  WebhookPayload
 } from './types';
 
 class MessageAPI {
   private apiService: APIService;
+  private webhookHandler?: (payload: WebhookPayload) => void;
 
   constructor(credentials: APICredentials, baseURL?: string) {
     this.apiService = new APIService(credentials, baseURL);
@@ -71,6 +74,43 @@ class MessageAPI {
   public async getUpdates(): Promise<any> {
     const url = `/updates`;
     return this.apiService.get(url);
+  }
+
+  /**
+   * Get all threads for an account.
+   * @param accountId - The account ID.
+   */
+  public async getAllThreads(accountId: string): Promise<ThreadList> {
+    const url = `/threads/${accountId}/get-all`;
+    return this.apiService.get(url);
+  }
+
+  /**
+   * Get threads by phone number.
+   * @param accountId - The account ID.
+   * @param phoneNumber - The phone number to filter by.
+   */
+  public async getThreadsByPhoneNumber(accountId: string, phoneNumber: string): Promise<ThreadList> {
+    const url = `/threads/${accountId}/get-all/${phoneNumber}`;
+    return this.apiService.get(url);
+  }
+
+  /**
+   * Process webhook payload.
+   * @param payload - The webhook payload.
+   */
+  public processWebhook(payload: WebhookPayload): void {
+    if (this.webhookHandler) {
+      this.webhookHandler(payload);
+    }
+  }
+
+  /**
+   * Set webhook handler.
+   * @param handler - The webhook handler function.
+   */
+  public setWebhookHandler(handler: (payload: WebhookPayload) => void): void {
+    this.webhookHandler = handler;
   }
 }
 

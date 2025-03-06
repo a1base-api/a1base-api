@@ -14,6 +14,7 @@ export interface SendGroupMessageData {
   thread_id: string;
   service: string;
   attachment_uri?: string;
+  from: string; // Added as required by new API
 }
 
 export interface MessageDetails {
@@ -62,4 +63,43 @@ export interface RecentMessages {
 export interface APICredentials {
   apiKey: string;
   apiSecret: string;
+}
+
+// Add new webhook types
+export interface MessageContent {
+  text?: string;
+  // Add other content types as needed
+}
+
+export interface WebhookPayload {
+  thread_id: string;
+  message_id: string;
+  thread_type: 'group' | 'individual' | 'broadcast';
+  content: string;
+  sender_number: string;
+  sender_name: string;
+  a1_account_id: string;
+  timestamp: string;
+  service: 'whatsapp' | 'telegram';
+  message_type: 'text' | 'image' | 'video' | 'audio' | 'document';
+  is_from_agent: boolean;
+  message_content: MessageContent;
+}
+
+// Add new interfaces for group management
+export interface Thread {
+  thread_id: string;
+  thread_type: 'group' | 'individual' | 'broadcast';
+  chat_name?: string;
+  participants: string[];
+  last_message?: {
+    content: string;
+    timestamp: string;
+    sender_number: string;
+  };
+}
+
+export interface ThreadList {
+  threads: Thread[];
+  total_count: number;
 }
